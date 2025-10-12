@@ -1,0 +1,9 @@
+{
+  "name": "@buildcosmo/widget-package",
+  "version": "1.0.0",
+  "description": "widget developing package",
+  "type": "module",
+  "main": "index.js",
+  "author": "Cosmo",
+  "license": "ISC"
+}
