@@ -3,7 +3,12 @@
   "version": "1.0.0",
   "description": "widget developing package",
   "type": "module",
-  "main": "CosmoWidget.js",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc --watch"
+  },
   "author": "Cosmo",
   "license": "ISC"
 }
