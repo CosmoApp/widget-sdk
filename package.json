@@ -1,6 +1,6 @@
 {
   "name": "@buildcosmo/widget",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "widget developing package",
   "type": "module",
   "main": "dist/index.js",
@@ -10,5 +10,9 @@
     "watch": "tsc --watch"
   },
   "author": "Cosmo",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "tsc": "^2.0.4",
+    "typescript": "^5.9.3"
+  }
 }
