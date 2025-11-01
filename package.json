@@ -1,17 +1,31 @@
 {
   "name": "@buildcosmo/widget",
   "version": "0.1.0",
-  "description": "widget developing package",
+  "description": "TypeScript SDK for building native macOS widgets",
   "type": "module",
   "main": "dist/index.js",
+  "module": "dist/index.js",
   "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build": "tsc",
-    "watch": "tsc --watch"
+    "watch": "tsc --watch",
+    "prepublishOnly": "npm run build"
   },
   "author": "Cosmo",
   "license": "ISC",
-  "dependencies": {
+  "publishConfig": {
+    "access": "public"
+  },
+  "devDependencies": {
     "tsc": "^2.0.4",
     "typescript": "^5.9.3"
   }
