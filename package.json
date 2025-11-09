@@ -22,8 +22,12 @@
   },
   "author": "Cosmo",
   "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/buildcosmo/widget-sdk"
+  },
   "publishConfig": {
-    "access": "public"
+    "registry": "https://npm.pkg.github.com"
   },
   "devDependencies": {
     "tsc": "^2.0.4",
