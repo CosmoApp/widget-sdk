@@ -1,6 +1,6 @@
 {
   "name": "@buildcosmo/widget",
-  "version": "0.3.3",
+  "version": "0.3.5",
   "description": "TypeScript SDK for building native macOS widgets",
   "type": "module",
   "main": "dist/index.js",
