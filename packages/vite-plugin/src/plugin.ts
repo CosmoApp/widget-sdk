@@ -62,6 +62,30 @@ function validateWidgetConfig(cfg: any): string[] {
     }
   }
 
+  if (cfg.mode && !['standard', 'webpage'].includes(cfg.mode)) {
+    errors.push('mode must be either "standard" or "webpage"');
+  }
+
+  if (cfg.mode === 'webpage') {
+    if (!cfg.webpage) {
+      errors.push('webpage config object is required when mode is "webpage"');
+    } else {
+      if (typeof cfg.webpage.targetURL !== 'string') {
+        errors.push('webpage.targetURL must be a string');
+      }
+      if ('useBrowserCookies' in cfg.webpage && typeof cfg.webpage.useBrowserCookies !== 'boolean') {
+        errors.push('webpage.useBrowserCookies must be a boolean');
+      }
+    }
+  } else {
+    // Standard mode (default)
+    if (cfg.webpage) {
+       // Optional: warn or error if webpage config is present in standard mode?
+       // For now, let's just ignore it or we could error to stay clean.
+       // errors.push('webpage config should not be present when mode is "standard"');
+    }
+  }
+
   return errors;
 }
 

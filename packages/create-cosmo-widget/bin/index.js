@@ -35,10 +35,12 @@ async function promptTemplate() {
     log('  1) Vanilla');
     log('  2) React');
     log('  3) Vue');
-    const frameworkChoice = await ask(rl, '\nEnter your choice (1-3, default: 1): ', '1');
+    log('  4) Webpage');
+    const frameworkChoice = await ask(rl, '\nEnter your choice (1-4, default: 1): ', '1');
     let framework = 'vanilla';
     if (frameworkChoice === '2') framework = 'react';
     if (frameworkChoice === '3') framework = 'vue';
+    if (frameworkChoice === '4') return 'webpage';
 
     log('\nUse TypeScript?');
     log('  1) Yes');
@@ -125,7 +127,8 @@ async function main() {
     'vue', 'vue-ts',
     'vanilla-tailwind', 'vanilla-ts-tailwind',
     'react-tailwind', 'react-ts-tailwind',
-    'vue-tailwind', 'vue-ts-tailwind'
+    'vue-tailwind', 'vue-ts-tailwind',
+    'webpage'
   ];
   if (!validTemplates.includes(template)) {
     log(`\nError: Invalid template "${template}". Valid options: ${validTemplates.join(', ')}`);

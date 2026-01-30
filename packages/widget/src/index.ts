@@ -13,3 +13,5 @@ import { swiftObserverCallback } from './core/observers.js';
   swiftCallback,
   swiftObserverCallback
 };
+
+export * from './config.js';

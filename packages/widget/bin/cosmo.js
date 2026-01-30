@@ -206,7 +206,26 @@ function createZip(sourceDir, outputPath) {
         archive.on('error', (err) => reject(err));
 
         archive.pipe(output);
+
+        // Add dist directory contents to root
         archive.directory(sourceDir, false);
+
+        // Add marketplace directory if it exists
+        const marketplacePath = path.join(process.cwd(), 'marketplace');
+        if (fs.existsSync(marketplacePath)) {
+            console.log('   Note: Including marketplace assets');
+            archive.directory(marketplacePath, 'marketplace');
+        }
+
+        // Add root files
+        const rootFiles = ['README.md', 'widget.config.json', 'widget.preferences-template.json'];
+        for (const file of rootFiles) {
+            const filePath = path.join(process.cwd(), file);
+            if (fs.existsSync(filePath)) {
+                archive.file(filePath, { name: file });
+            }
+        }
+
         archive.finalize();
     });
 }
