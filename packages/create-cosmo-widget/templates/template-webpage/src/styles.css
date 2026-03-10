@@ -1,0 +1,7 @@
+
+/* This CSS is injected before the page renders (at documentStart) */
+
+body {
+  /* Example: Add a border */
+  /* border: 5px solid red; */
+}

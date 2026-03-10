@@ -1,18 +1,7 @@
 # Marketplace Assets
 
-This directory contains assets that will be displayed on the Cosmo Marketplace listing for your widget.
+This directory contains assets used for your widget's listing on the marketplace.
 
-## Structure
-
-- **`previews/`**: Add screenshots and videos here.
-  - Files are sorted **alphabetically/numerically**.
-  - The **first image** found will be used as the **Thumbnail** for your widget in the store.
-  - Supported formats:
-    - Images: `.png`, `.jpg`, `.jpeg`, `.webp`, `.gif` (Optimized to WebP automatically).
-    - Videos: `.mp4` (Max 100MB).
-  
-- **`images/`**: Add images used in your `README.md` documentation here.
-  - Example usage in your root Readme: `![Feature Demo](./marketplace/images/demo.png)`
-  - These are also optimized and hosted on a global CDN.
-
-> **Note**: Updating these assets requires publishing a new version of your widget.
+## structure
+- `images/`: Place images referenced in your root `README.md` here.
+- `previews/`: Place screenshots (images) or video previews of your widget here. These will be displayed in the gallery.
