@@ -1,6 +1,6 @@
 {
   "name": "create-cosmo-widget",
-  "version": "0.3.22",
+  "version": "0.3.31",
   "description": "Scaffold a Vite-based Cosmo widget project",
   "type": "module",
   "bin": {

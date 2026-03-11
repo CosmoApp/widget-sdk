@@ -73,10 +73,15 @@ export async function getWindowPosition(): Promise<WindowPosition> {
  * @param position The new position for the window.
  */
 export function setWindowPosition(
-  position: WindowPosition | WindowPositionProportional
+  x: number,
+  y: number,
+  options?: { proportional?: boolean }
 ): void {
   if (window.webkit?.messageHandlers?.setWindowPosition) {
-    window.webkit.messageHandlers.setWindowPosition.postMessage(position);
+    const message = options?.proportional
+      ? { x, y, proportional: true }
+      : { x, y };
+    window.webkit.messageHandlers.setWindowPosition.postMessage(message);
   } else {
     console.warn("setWindowPosition handler not available");
   }

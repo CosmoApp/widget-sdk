@@ -1,6 +1,7 @@
 {
+  "name": "My Widget",
   "minCosmoVersion": "0.4.0",
-  "version": "1.1.1",
+  "version": "1.0.0",
   "defaultWidth": 300,
   "defaultHeight": 300,
   "minWidth": 200,

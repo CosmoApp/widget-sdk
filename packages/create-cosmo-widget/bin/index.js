@@ -35,10 +35,12 @@ async function promptTemplate() {
     log('  1) Vanilla');
     log('  2) React');
     log('  3) Vue');
-    const frameworkChoice = await ask(rl, '\nEnter your choice (1-3, default: 1): ', '1');
+    log('  4) Webpage');
+    const frameworkChoice = await ask(rl, '\nEnter your choice (1-4, default: 1): ', '1');
     let framework = 'vanilla';
     if (frameworkChoice === '2') framework = 'react';
     if (frameworkChoice === '3') framework = 'vue';
+    if (frameworkChoice === '4') return 'webpage';
 
     log('\nUse TypeScript?');
     log('  1) Yes');
@@ -84,7 +86,7 @@ async function main() {
       output: process.stdout
     });
     try {
-      rawTarget = await ask(rl, '\nProject name (default: cosmo-widget): ', 'cosmo-widget');
+      rawTarget = await ask(rl, '\nProject name (default: my-widget): ', 'my-widget');
     } finally {
       rl.close();
     }
@@ -101,6 +103,18 @@ async function main() {
     mkdirSync(targetDir, { recursive: true });
   }
 
+  // Prompt for Widget Display Name
+  const rlName = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout
+  });
+  let widgetDisplayName;
+  try {
+    widgetDisplayName = await ask(rlName, '\nWidget Display Name (default: My Widget): ', 'My Widget');
+  } finally {
+    rlName.close();
+  }
+
   // Prompt for template if not provided
   if (!template) {
     template = await promptTemplate();
@@ -113,7 +127,8 @@ async function main() {
     'vue', 'vue-ts',
     'vanilla-tailwind', 'vanilla-ts-tailwind',
     'react-tailwind', 'react-ts-tailwind',
-    'vue-tailwind', 'vue-ts-tailwind'
+    'vue-tailwind', 'vue-ts-tailwind',
+    'webpage'
   ];
   if (!validTemplates.includes(template)) {
     log(`\nError: Invalid template "${template}". Valid options: ${validTemplates.join(', ')}`);
@@ -138,6 +153,29 @@ async function main() {
     writeFileSync(pkgPath, JSON.stringify(pkg, null, 2));
   } catch (e) {
     log('Warning: failed to set project name in package.json');
+  }
+
+  // Patch widget.config.json name
+  const configPath = resolve(targetDir, 'widget.config.json');
+  if (existsSync(configPath)) {
+    try {
+      const config = JSON.parse(readFileSync(configPath, 'utf-8'));
+      config.name = widgetDisplayName; // Use user-provided display name
+      writeFileSync(configPath, JSON.stringify(config, null, 2));
+    } catch (e) {
+      log('Warning: failed to set widget name in widget.config.json');
+    }
+  }
+
+  // Rename _gitignore to .gitignore
+  const gitignorePath = resolve(targetDir, '_gitignore');
+  if (existsSync(gitignorePath)) {
+    try {
+      const { renameSync } = await import('fs');
+      renameSync(gitignorePath, resolve(targetDir, '.gitignore'));
+    } catch (e) {
+      log('Warning: failed to rename _gitignore to .gitignore');
+    }
   }
 
   // Install deps (best-effort)

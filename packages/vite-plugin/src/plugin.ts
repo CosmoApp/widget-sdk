@@ -1,4 +1,9 @@
-import type { Plugin, ViteDevServer, PreviewServer } from 'vite';
+import type {
+  Logger,
+  Plugin,
+  PreviewServer,
+  ViteDevServer,
+} from 'vite';
 import { spawnSync } from 'child_process';
 import { copyFileSync, existsSync, mkdirSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
@@ -17,6 +22,9 @@ export interface CosmoPluginOptions {
    */
   widgetPath?: string;
 }
+
+const DEV_CLIENT_LOG_ENDPOINT = '/__cosmo/client-log';
+const DEV_CLIENT_LOG_PREFIX = '[cosmo-widget-client]';
 
 function validateWidgetConfig(cfg: any): string[] {
   const errors: string[] = [];
@@ -62,6 +70,30 @@ function validateWidgetConfig(cfg: any): string[] {
     }
   }
 
+  if (cfg.mode && !['standard', 'webpage'].includes(cfg.mode)) {
+    errors.push('mode must be either "standard" or "webpage"');
+  }
+
+  if (cfg.mode === 'webpage') {
+    if (!cfg.webpage) {
+      errors.push('webpage config object is required when mode is "webpage"');
+    } else {
+      if (typeof cfg.webpage.targetURL !== 'string') {
+        errors.push('webpage.targetURL must be a string');
+      }
+      if ('useBrowserCookies' in cfg.webpage && typeof cfg.webpage.useBrowserCookies !== 'boolean') {
+        errors.push('webpage.useBrowserCookies must be a boolean');
+      }
+    }
+  } else {
+    // Standard mode (default)
+    if (cfg.webpage) {
+       // Optional: warn or error if webpage config is present in standard mode?
+       // For now, let's just ignore it or we could error to stay clean.
+       // errors.push('webpage config should not be present when mode is "standard"');
+    }
+  }
+
   return errors;
 }
 
@@ -91,6 +123,7 @@ function validatePreferencesTemplate(prefs: any): string[] {
         }
       }
     }
+
   }
   
   return errors;
@@ -166,6 +199,8 @@ export function cosmo(options: CosmoPluginOptions = {}): Plugin {
       }
     },
     configureServer(server: ViteDevServer) {
+      registerDevClientLogEndpoint(server);
+
       server.httpServer?.once('listening', () => {
         if (!options.serverOnly) {
           const widgetPath = options.widgetPath || server.config.root;
@@ -175,6 +210,8 @@ export function cosmo(options: CosmoPluginOptions = {}): Plugin {
       });
     },
     configurePreviewServer(server: PreviewServer) {
+      registerDevClientLogEndpoint(server);
+
       server.httpServer?.once('listening', () => {
         if (!options.serverOnly) {
           const widgetPath = options.widgetPath || server.config.root;
@@ -184,6 +221,97 @@ export function cosmo(options: CosmoPluginOptions = {}): Plugin {
       });
     }
   };
+}
+
+function registerDevClientLogEndpoint(server: Pick<ViteDevServer, 'config' | 'middlewares'>) {
+  server.middlewares.use((req, res, next) => {
+    const requestPath = req.url ? req.url.split('?')[0] : '';
+
+    if (req.method !== 'POST' || requestPath !== DEV_CLIENT_LOG_ENDPOINT) {
+      next();
+      return;
+    }
+
+    let rawBody = '';
+    req.setEncoding('utf8');
+
+    req.on('data', (chunk) => {
+      rawBody += chunk;
+    });
+
+    req.on('end', () => {
+      const payload = parseDevClientLogPayload(rawBody);
+      const formattedMessage = formatDevClientLogMessage(payload);
+      logDevClientMessage(server.config.logger, payload.level, formattedMessage);
+
+      res.statusCode = 204;
+      res.end();
+    });
+
+    req.on('error', (error) => {
+      server.config.logger.error(
+        `${DEV_CLIENT_LOG_PREFIX} failed to read client log payload: ${error.message}`,
+      );
+      res.statusCode = 400;
+      res.end();
+    });
+  });
+}
+
+function parseDevClientLogPayload(rawBody: string): { level: string; message: string; details?: unknown } {
+  try {
+    const parsed = JSON.parse(rawBody);
+    const level = typeof parsed?.level === 'string' ? parsed.level : 'info';
+    const message = typeof parsed?.message === 'string' ? parsed.message : 'client event';
+    return {
+      level,
+      message,
+      details: parsed?.details,
+    };
+  } catch {
+    return {
+      level: 'warn',
+      message: 'received malformed client log payload',
+      details: rawBody,
+    };
+  }
+}
+
+function formatDevClientLogMessage(payload: { message: string; details?: unknown }): string {
+  const details = formatDevClientLogDetails(payload.details);
+  return details
+    ? `${DEV_CLIENT_LOG_PREFIX} ${payload.message} ${details}`
+    : `${DEV_CLIENT_LOG_PREFIX} ${payload.message}`;
+}
+
+function formatDevClientLogDetails(details: unknown): string {
+  if (details == null) {
+    return '';
+  }
+
+  if (typeof details === 'string') {
+    return details;
+  }
+
+  try {
+    return JSON.stringify(details);
+  } catch {
+    return String(details);
+  }
+}
+
+function logDevClientMessage(logger: Logger, level: string, message: string) {
+  switch (level) {
+    case 'error':
+      logger.error(message);
+      break;
+    case 'warn':
+      logger.warn(message);
+      break;
+    default:
+      logger.info(message);
+      break;
+  }
 }
 
 function getDevServerUrl(server: ViteDevServer | PreviewServer): string {

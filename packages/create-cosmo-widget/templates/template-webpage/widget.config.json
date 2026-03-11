@@ -1,0 +1,16 @@
+
+{
+  "minCosmoVersion": "1.0.0",
+  "defaultWidth": 800,
+  "defaultHeight": 600,
+  "minWidth": 300,
+  "minHeight": 200,
+  "allowResize": true,
+  "keepAspectRatio": false,
+  "allowLockScreen": false,
+  "allowInternet": true,
+  "mode": "webpage",
+  "webpage": {
+    "targetURL": "https://example.com"
+  }
+}

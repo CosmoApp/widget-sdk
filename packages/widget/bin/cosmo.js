@@ -7,6 +7,8 @@ import path from 'path';
 import os from 'os';
 import archiver from 'archiver';
 import axios from 'axios';
+import http from 'http';
+
 
 const UPLOAD_URL_ENDPOINT = process.env.COSMO_UPLOAD_URL_ENDPOINT || 'https://od8wzcssy7.execute-api.us-west-2.amazonaws.com/Prod/generate-upload-url';
 const AUTH_WEB_URL = process.env.COSMO_AUTH_WEB_URL || 'https://buildcosmo.com/cli-auth';
@@ -67,8 +69,20 @@ program
             console.log('🔐 Requesting upload URL...');
 
             // Get authentication token
-            let token = getToken();
-            if (!token || isTokenExpired(token)) {
+            let token = process.env.COSMO_AUTH_TOKEN || getToken();
+
+            // In CI environments, we should never attempt interactive login
+            const isCI = process.env.CI === 'true' || process.env.CI === '1';
+
+            if (!token || (isTokenExpired(token) && !process.env.COSMO_AUTH_TOKEN)) {
+                if (process.env.COSMO_AUTH_TOKEN) {
+                    throw new Error('COSMO_AUTH_TOKEN is invalid or expired (401)');
+                }
+
+                if (isCI) {
+                    throw new Error('Authentication required. Please set COSMO_AUTH_TOKEN environment variable in CI.');
+                }
+
                 console.log('⚠️  Not authenticated or session expired. Starting login flow...');
                 token = await startAuthFlow();
                 saveToken(token);
@@ -92,6 +106,9 @@ program
                 });
             } catch (error) {
                 if (error.response && error.response.status === 401) {
+                    if (process.env.COSMO_AUTH_TOKEN) {
+                        throw new Error('COSMO_AUTH_TOKEN is invalid or expired (401)');
+                    }
                     console.log('⚠️  Session expired. Re-authenticating...');
                     token = await startAuthFlow();
                     saveToken(token);
@@ -189,7 +206,26 @@ function createZip(sourceDir, outputPath) {
         archive.on('error', (err) => reject(err));
 
         archive.pipe(output);
+
+        // Add dist directory contents to root
         archive.directory(sourceDir, false);
+
+        // Add marketplace directory if it exists
+        const marketplacePath = path.join(process.cwd(), 'marketplace');
+        if (fs.existsSync(marketplacePath)) {
+            console.log('   Note: Including marketplace assets');
+            archive.directory(marketplacePath, 'marketplace');
+        }
+
+        // Add root files
+        const rootFiles = ['README.md', 'widget.config.json', 'widget.preferences-template.json'];
+        for (const file of rootFiles) {
+            const filePath = path.join(process.cwd(), file);
+            if (fs.existsSync(filePath)) {
+                archive.file(filePath, { name: file });
+            }
+        }
+
         archive.finalize();
     });
 }
@@ -199,7 +235,7 @@ function createZip(sourceDir, outputPath) {
  */
 function startAuthFlow() {
     return new Promise((resolve, reject) => {
-        const server = createServer((req, res) => {
+        const server = http.createServer((req, res) => {
             const url = new URL(req.url, `http://localhost:${CALLBACK_PORT}`);
             const token = url.searchParams.get('token');
 
