@@ -3,6 +3,7 @@ import { fileURLToPath } from 'url';
 import { dirname, resolve, basename } from 'path';
 import { existsSync, mkdirSync, readFileSync, writeFileSync, cpSync } from 'fs';
 import { spawn } from 'child_process';
+import { randomUUID } from 'crypto';
 import * as readline from 'readline';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -161,6 +162,12 @@ async function main() {
     try {
       const config = JSON.parse(readFileSync(configPath, 'utf-8'));
       config.name = widgetDisplayName; // Use user-provided display name
+      if (!config.configSchemaVersion) {
+        config.configSchemaVersion = 1;
+      }
+      if (!config.id) {
+        config.id = randomUUID();
+      }
       writeFileSync(configPath, JSON.stringify(config, null, 2));
     } catch (e) {
       log('Warning: failed to set widget name in widget.config.json');
@@ -198,4 +205,3 @@ async function main() {
 }
 
 main().catch((e) => { console.error(e); process.exit(1); });
-

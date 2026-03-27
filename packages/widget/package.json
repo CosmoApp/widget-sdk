@@ -1,6 +1,6 @@
 {
   "name": "@buildcosmo/widget",
-  "version": "0.3.5",
+  "version": "0.4.0-beta.0",
   "description": "TypeScript SDK for building native macOS widgets",
   "type": "module",
   "main": "dist/index.js",
@@ -20,7 +20,7 @@
     "bin"
   ],
   "scripts": {
-    "build": "tsc",
+    "build": "npm run build --workspace=@buildcosmo/widget-config-schema && tsc",
     "watch": "tsc --watch",
     "prepublishOnly": "npm run build"
   },
@@ -31,9 +31,11 @@
     "url": "https://github.com/buildcosmo/widget-sdk"
   },
   "publishConfig": {
-    "access": "public"
+    "access": "public",
+    "tag": "beta"
   },
   "dependencies": {
+    "@buildcosmo/widget-config-schema": "^0.1.0-beta.0",
     "archiver": "^7.0.1",
     "axios": "^1.13.2",
     "commander": "^14.0.2"

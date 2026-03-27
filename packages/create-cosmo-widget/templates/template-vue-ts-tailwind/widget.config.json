@@ -1,6 +1,6 @@
 {
+  "configSchemaVersion": 1,
   "name": "My Widget",
-  "minCosmoVersion": "0.4.0",
   "version": "1.0.0",
   "defaultWidth": 300,
   "defaultHeight": 300,

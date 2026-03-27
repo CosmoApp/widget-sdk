@@ -1,6 +1,5 @@
-
 {
-  "minCosmoVersion": "1.0.0",
+  "configSchemaVersion": 1,
   "defaultWidth": 800,
   "defaultHeight": 600,
   "minWidth": 300,

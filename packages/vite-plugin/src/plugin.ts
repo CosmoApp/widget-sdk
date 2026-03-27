@@ -7,6 +7,7 @@ import type {
 import { spawnSync } from 'child_process';
 import { copyFileSync, existsSync, mkdirSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
+import { validateWidgetConfig } from '@buildcosmo/widget-config-schema';
 
 export interface CosmoPluginOptions {
   /**
@@ -25,77 +26,6 @@ export interface CosmoPluginOptions {
 
 const DEV_CLIENT_LOG_ENDPOINT = '/__cosmo/client-log';
 const DEV_CLIENT_LOG_PREFIX = '[cosmo-widget-client]';
-
-function validateWidgetConfig(cfg: any): string[] {
-  const errors: string[] = [];
-  const expectType = (key: string, type: string) => {
-    if (!(key in cfg)) errors.push(`${key} is required`);
-    else if (typeof cfg[key] !== type) errors.push(`${key} must be ${type}`);
-  };
-
-  expectType('minCosmoVersion', 'string');
-  expectType('defaultWidth', 'number');
-  expectType('defaultHeight', 'number');
-  expectType('minWidth', 'number');
-  expectType('minHeight', 'number');
-  expectType('allowResize', 'boolean');
-  expectType('keepAspectRatio', 'boolean');
-  expectType('allowLockScreen', 'boolean');
-  expectType('allowInternet', 'boolean');
-
-  // Basic constraints
-  if (typeof cfg.defaultWidth === 'number' && cfg.defaultWidth <= 0) errors.push('defaultWidth must be > 0');
-  if (typeof cfg.defaultHeight === 'number' && cfg.defaultHeight <= 0) errors.push('defaultHeight must be > 0');
-  if (typeof cfg.minWidth === 'number' && typeof cfg.defaultWidth === 'number' && cfg.minWidth > cfg.defaultWidth) errors.push('minWidth must be <= defaultWidth');
-  if (typeof cfg.minHeight === 'number' && typeof cfg.defaultHeight === 'number' && cfg.minHeight > cfg.defaultHeight) errors.push('minHeight must be <= defaultHeight');
-
-  if ('defaultPos' in cfg) {
-    if (!Array.isArray(cfg.defaultPos) || cfg.defaultPos.length !== 2) {
-      errors.push('defaultPos must be an array of 2 numbers');
-    } else {
-      const [x, y] = cfg.defaultPos;
-      if (typeof x !== 'number' || typeof y !== 'number') {
-        errors.push('defaultPos must contain numbers');
-      } else if (x < 0 || x > 1 || y < 0 || y > 1) {
-        errors.push('defaultPos coordinates must be between 0 and 1');
-      }
-    }
-  }
-
-  if ('backgroundBlurRadius' in cfg) {
-    if (typeof cfg.backgroundBlurRadius !== 'number') {
-      errors.push('backgroundBlurRadius must be a number');
-    } else if (cfg.backgroundBlurRadius < 0) {
-      errors.push('backgroundBlurRadius must be >= 0');
-    }
-  }
-
-  if (cfg.mode && !['standard', 'webpage'].includes(cfg.mode)) {
-    errors.push('mode must be either "standard" or "webpage"');
-  }
-
-  if (cfg.mode === 'webpage') {
-    if (!cfg.webpage) {
-      errors.push('webpage config object is required when mode is "webpage"');
-    } else {
-      if (typeof cfg.webpage.targetURL !== 'string') {
-        errors.push('webpage.targetURL must be a string');
-      }
-      if ('useBrowserCookies' in cfg.webpage && typeof cfg.webpage.useBrowserCookies !== 'boolean') {
-        errors.push('webpage.useBrowserCookies must be a boolean');
-      }
-    }
-  } else {
-    // Standard mode (default)
-    if (cfg.webpage) {
-       // Optional: warn or error if webpage config is present in standard mode?
-       // For now, let's just ignore it or we could error to stay clean.
-       // errors.push('webpage config should not be present when mode is "standard"');
-    }
-  }
-
-  return errors;
-}
 
 function validatePreferencesTemplate(prefs: any): string[] {
   const errors: string[] = [];
@@ -124,6 +54,32 @@ function validatePreferencesTemplate(prefs: any): string[] {
       }
     }
 
+    // Validate control panel color modifiers
+    if ('controlPanelBackgroundColors' in p) {
+      if (!Array.isArray(p.controlPanelBackgroundColors)) {
+        errors.push(`${key}.controlPanelBackgroundColors: must be an array of strings`);
+      } else {
+        if (p.controlPanelBackgroundColors.some((v: any) => typeof v !== 'string')) {
+          errors.push(`${key}.controlPanelBackgroundColors: must contain strings`);
+        }
+        if (Array.isArray(p.options) && p.options.length !== p.controlPanelBackgroundColors.length) {
+          errors.push(`${key}: controlPanelBackgroundColors length (${p.controlPanelBackgroundColors.length}) must match options length (${p.options.length})`);
+        }
+      }
+    }
+
+    if ('controlPanelTextColors' in p) {
+      if (!Array.isArray(p.controlPanelTextColors)) {
+        errors.push(`${key}.controlPanelTextColors: must be an array of strings`);
+      } else {
+        if (p.controlPanelTextColors.some((v: any) => typeof v !== 'string')) {
+          errors.push(`${key}.controlPanelTextColors: must contain strings`);
+        }
+        if (Array.isArray(p.options) && p.options.length !== p.controlPanelTextColors.length) {
+          errors.push(`${key}: controlPanelTextColors length (${p.controlPanelTextColors.length}) must match options length (${p.options.length})`);
+        }
+      }
+    }
   }
   
   return errors;

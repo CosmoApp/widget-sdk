@@ -1,0 +1,156 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://buildcosmo.com/schemas/widget-config/v1.json",
+  "title": "Cosmo Widget Config v1",
+  "type": "object",
+  "required": [
+    "configSchemaVersion",
+    "defaultWidth",
+    "defaultHeight",
+    "minWidth",
+    "minHeight",
+    "allowResize",
+    "keepAspectRatio",
+    "allowLockScreen",
+    "allowInternet"
+  ],
+  "properties": {
+    "configSchemaVersion": {
+      "type": "integer",
+      "const": 1
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$"
+    },
+    "name": {
+      "type": "string"
+    },
+    "version": {
+      "type": "string"
+    },
+    "defaultWidth": {
+      "type": "number",
+      "exclusiveMinimum": 0
+    },
+    "defaultHeight": {
+      "type": "number",
+      "exclusiveMinimum": 0
+    },
+    "minWidth": {
+      "type": "number"
+    },
+    "minHeight": {
+      "type": "number"
+    },
+    "maxWidth": {
+      "type": "number"
+    },
+    "maxHeight": {
+      "type": "number"
+    },
+    "allowResize": {
+      "type": "boolean"
+    },
+    "keepAspectRatio": {
+      "type": "boolean"
+    },
+    "allowLockScreen": {
+      "type": "boolean"
+    },
+    "allowInternet": {
+      "type": "boolean"
+    },
+    "defaultPos": {
+      "type": "array",
+      "items": {
+        "type": "number",
+        "minimum": 0,
+        "maximum": 1
+      },
+      "minItems": 2,
+      "maxItems": 2
+    },
+    "backgroundBlurRadius": {
+      "type": "number",
+      "minimum": 0
+    },
+    "mode": {
+      "type": "string",
+      "enum": ["standard", "webpage"]
+    },
+    "webpage": {
+      "type": "object",
+      "required": ["targetURL"],
+      "properties": {
+        "targetURL": {
+          "type": "string"
+        },
+        "useBrowserCookies": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": true
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "required": ["mode"],
+        "properties": {
+          "mode": {
+            "const": "webpage"
+          }
+        }
+      },
+      "then": {
+        "required": ["webpage"]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "defaultWidth": {
+            "type": "number"
+          },
+          "minWidth": {
+            "type": "number"
+          }
+        },
+        "required": ["defaultWidth", "minWidth"]
+      },
+      "then": {
+        "properties": {
+          "minWidth": {
+            "maximum": {
+              "$data": "/defaultWidth"
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "defaultHeight": {
+            "type": "number"
+          },
+          "minHeight": {
+            "type": "number"
+          }
+        },
+        "required": ["defaultHeight", "minHeight"]
+      },
+      "then": {
+        "properties": {
+          "minHeight": {
+            "maximum": {
+              "$data": "/defaultHeight"
+            }
+          }
+        }
+      }
+    }
+  ],
+  "additionalProperties": true
+}

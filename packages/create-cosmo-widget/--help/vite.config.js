@@ -71,7 +71,6 @@ function validateWidgetConfig(cfg) {
     else if (typeof cfg[key] !== type) errors.push(`${key} must be ${type}`);
   };
 
-  expectType('minCosmoVersion', 'string');
   expectType('defaultWidth', 'number');
   expectType('defaultHeight', 'number');
   expectType('minWidth', 'number');
@@ -137,6 +136,33 @@ function validatePreferencesTemplate(prefs) {
         }
       }
     }
+
+    // Validate control panel color modifiers
+    if ('controlPanelBackgroundColors' in p) {
+      if (!Array.isArray(p.controlPanelBackgroundColors)) {
+        errors.push(`${key}.controlPanelBackgroundColors: must be an array of strings`);
+      } else {
+        if (p.controlPanelBackgroundColors.some((v) => typeof v !== 'string')) {
+          errors.push(`${key}.controlPanelBackgroundColors: must contain strings`);
+        }
+        if (Array.isArray(p.options) && p.options.length !== p.controlPanelBackgroundColors.length) {
+          errors.push(`${key}: controlPanelBackgroundColors length (${p.controlPanelBackgroundColors.length}) must match options length (${p.options.length})`);
+        }
+      }
+    }
+
+    if ('controlPanelTextColors' in p) {
+      if (!Array.isArray(p.controlPanelTextColors)) {
+        errors.push(`${key}.controlPanelTextColors: must be an array of strings`);
+      } else {
+        if (p.controlPanelTextColors.some((v) => typeof v !== 'string')) {
+          errors.push(`${key}.controlPanelTextColors: must contain strings`);
+        }
+        if (Array.isArray(p.options) && p.options.length !== p.controlPanelTextColors.length) {
+          errors.push(`${key}: controlPanelTextColors length (${p.controlPanelTextColors.length}) must match options length (${p.options.length})`);
+        }
+      }
+    }
   }
 
   return errors;
@@ -145,5 +171,3 @@ function validatePreferencesTemplate(prefs) {
 export default defineConfig({
   plugins: [copyWidgetMeta()],
 });
-
-

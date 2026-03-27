@@ -1,4 +1,6 @@
 
+import type { WidgetConfigSchemaVersion } from "@buildcosmo/widget-config-schema";
+
 export type WidgetMode = "standard" | "webpage";
 
 export interface WebpageConfig {
@@ -17,10 +19,17 @@ export interface WebpageConfig {
 
 export interface WidgetConfig {
   /**
-   * The minimum version of Cosmo required to run this widget.
-   * Format: "x.y.z"
+   * Version of the widget.config.json schema used by this widget.
+   * New scaffolds write the current version explicitly.
+   * Older configs without this field are treated as schema v1 by build-time validation.
    */
-  minCosmoVersion: string;
+  configSchemaVersion?: WidgetConfigSchemaVersion;
+
+  /**
+   * Stable marketplace identity for this widget.
+   * Keep this fixed for the lifetime of the widget.
+   */
+  id?: string;
 
   /**
    * The default width of the widget window.
