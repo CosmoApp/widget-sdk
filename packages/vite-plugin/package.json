@@ -1,6 +1,6 @@
 {
   "name": "@buildcosmo/vite-plugin",
-  "version": "0.3.0-beta.0",
+  "version": "0.3.0-beta.1",
   "description": "Vite plugin for Cosmo widget development",
   "type": "module",
   "main": "dist/index.js",
@@ -16,7 +16,7 @@
     "dist"
   ],
   "scripts": {
-    "build": "npm run build --workspace=@buildcosmo/widget-config-schema && tsc",
+    "build": "npm run build --workspace=@buildcosmo/widget && tsc",
     "watch": "tsc --watch",
     "prepublishOnly": "npm run build"
   },
@@ -31,7 +31,7 @@
     "tag": "beta"
   },
   "dependencies": {
-    "@buildcosmo/widget-config-schema": "^0.1.0-beta.0"
+    "@buildcosmo/widget": "^0.4.0-beta.1"
   },
   "peerDependencies": {
     "vite": "^5.0.0 || ^6.0.0 || ^7.0.0"

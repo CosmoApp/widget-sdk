@@ -7,7 +7,7 @@ import type {
 import { spawnSync } from 'child_process';
 import { copyFileSync, existsSync, mkdirSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
-import { validateWidgetConfig } from '@buildcosmo/widget-config-schema';
+import { validateWidgetConfig } from '@buildcosmo/widget';
 
 export interface CosmoPluginOptions {
   /**

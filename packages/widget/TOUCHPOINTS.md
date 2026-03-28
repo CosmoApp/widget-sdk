@@ -3,7 +3,7 @@
 - `packages/widget/src/index.ts`
 - `packages/widget/src/config.ts`
 - `packages/widget/bin/cosmo.js`
-- `packages/widget-config-schema/**`
+- `packages/widget/schemas/**`
 - `packages/widget/src/core/**`
 - `packages/widget/src/window/**`
 - `packages/widget/src/eventManager/**`

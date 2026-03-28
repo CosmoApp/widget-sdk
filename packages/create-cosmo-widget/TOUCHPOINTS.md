@@ -4,4 +4,4 @@
 - `packages/create-cosmo-widget/templates/**/widget.config.json`
 - `packages/create-cosmo-widget/templates/**/widget.preferences-template.json`
 - `packages/create-cosmo-widget/templates/**/src/**`
-- `packages/widget-config-schema/**`
+- `packages/widget/schemas/**`

@@ -103,7 +103,10 @@ function formatValidationError(error: ErrorObject): string {
     return `${error.params.missingProperty} is required`;
   }
 
-  if (error.keyword === "additionalProperties" && typeof error.params.additionalProperty === "string") {
+  if (
+    error.keyword === "additionalProperties" &&
+    typeof error.params.additionalProperty === "string"
+  ) {
     return `Unexpected property: ${error.params.additionalProperty}`;
   }
 

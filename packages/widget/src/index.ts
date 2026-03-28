@@ -4,6 +4,7 @@ export * from './systemResources/index.js';
 export * from './window/index.js';
 export * as systemSettings from './systemSettings/index.js';
 export * as errors from './errors/index.js';
+export * from './widgetConfigSchema.js';
 
 import { swiftCallback } from './core/request.js';
 import { swiftObserverCallback } from './core/observers.js';

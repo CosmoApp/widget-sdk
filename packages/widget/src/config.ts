@@ -1,5 +1,4 @@
-
-import type { WidgetConfigSchemaVersion } from "@buildcosmo/widget-config-schema";
+import type { WidgetConfigSchemaVersion } from "./widgetConfigSchema.js";
 
 export type WidgetMode = "standard" | "webpage";
 

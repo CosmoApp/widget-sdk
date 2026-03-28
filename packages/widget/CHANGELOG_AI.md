@@ -12,5 +12,5 @@
 ## 2026-03-26
 
 - Added `configSchemaVersion` to the widget config contract so new widget projects can declare which `widget.config.json` schema they were authored against.
-- Introduced a shared `@buildcosmo/widget-config-schema` package that owns versioned widget config schemas and the canonical build-time validator used by the Vite plugin.
+- Folded the shared widget config schema and validator into `@buildcosmo/widget` so the SDK remains the single published source of truth for config validation.
 - Removed the old app-version floor field from the runtime config contract and shared schema in favor of schema-versioned widget configs.

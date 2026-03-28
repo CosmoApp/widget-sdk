@@ -10,6 +10,6 @@
 
 ## 2026-03-26
 
-- Updated scaffolded widget configs to declare `configSchemaVersion: 1`, matching the new shared widget config schema package.
+- Updated scaffolded widget configs to declare `configSchemaVersion: 1`, matching the widget SDK's shared schema contract.
 - Updated the scaffold generator to backfill `configSchemaVersion` when patching template config files during project creation.
 - Removed the old app-version floor field from new scaffold templates so freshly generated widgets rely on the schema contract instead of developer-authored compatibility guesses.
